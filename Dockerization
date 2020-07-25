@@ -1,0 +1,70 @@
+step 1
+install docker desktop
+
+step 2
+add dockerfile and dockerignore files to project folder
+
+step3
+navigate to project folder and open cmd prompt
+
+step 2
+docker built -t cognizantreflect:0.0.1.RELEASE .
+
+step 3
+docker run -d -p 5000:80 cognizantreflect:0.0.1.RELEASE
+
+step 4
+get ip
+docker inspect <containerid>
+
+<ip>/ping EX. http://172.17.34.114/ping
+<localhost> http://localhost:5002/ping
+
+Kubernetes(simplest way)
+
+step 1
+open api project folder in vs code
+
+step 2
+Install kubernetes extension
+
+step 3
+go to docker desktop select settings go to kubernetes and select enable kubernetes
+Apply and Restart
+
+step 4
+go to vs code in the terminal type 
+kubectl config get-contexts
+you can see docker desktop cluster running
+
+step 5
+docker build -t codejammers/reflectuser:0.0.1.RELEASE .
+
+step 6
+create a new file deployment.yml in the project folder
+type deploy select intellisense kuberenets deployment
+fill with the configuration data
+
+step 7
+run command
+kubectl apply -f ./deployment.yml
+
+step 8
+kubectl get deployments
+you can see the deployment got created
+
+step 9
+kubectl get pods
+you can see pod get created
+
+step 10
+create service.yml in the project folder
+type service select intellisense kubernetes service
+fill with the configuration data
+
+step 10
+kubectl apply -f ./service.yml
+
+step 11
+kubectl delete pods reflectionuser-deployment-58f5ccdd8c-tdn6g
+kubectl delete services reflectionuser-service
