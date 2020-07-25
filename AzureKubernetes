@@ -1,0 +1,100 @@
+Azure AKS kubernetes
+
+step 1. Install Azure CLI
+
+step 2 Create container registry in azure portal
+
+step 3 go back to vs code and type in terminal
+az login
+
+step 4 create service principle
+az ad sp create-for-rbac
+
+step 5 copy appid and passord generated
+"appId": "6fafe619-3cdc-49bc-ba32-4ba39c96304c",
+"password": "sTOaoo~MHBMO91eAI5SLJd23ZdxouTbqko",
+"tenant": "cea101fb-acfa-4ba2-90e9-5a83909297e7"
+
+step 6 goto porta-> container registries
+click access control
+select role assignments -you can see azure cli role assignment added
+
+step 7 create kubernates service
+
+step 8 Authentication - select configure service principle and add appid and password
+create kubernetes
+
+step 9 go back to code
+docker tag codejammers/reflectionuser:0.0.2.RELEASE cognizantreflectregistry.azurecr.io/reflectionuser:0.0.1.RELEASE   (adding a new tag with containerregisty login server name)
+az acr login --name cognizantreflectregistry
+docker push cognizantreflectregistry.azurecr.io/reflectionuser:0.0.1.RELEASE
+
+step 10 
+create kubernetes deployment yml 
+create kubernetes service yml after installing kubernetes extension
+remove WORKDIR "/src/." from deployment.yml
+add   type: LoadBalancer to service.yml
+add cognizantreflectregistry.azurecr.io/reflectionuser:0.0.1.RELEASE as image in deployment.yml
+
+step 11
+az aks get-credentials --resource-group codejammers --name cognizantreflectkubernetes
+kubectl get nodes  -you can see the node got created
+
+step 12
+kubectl apply -f ./deployment.yml
+kubectl get pods
+you can see status ContainerCreating, wait till status becomes running
+if showing other than above status type - kubectl describe pod <podname> (you can get from kubectl get pods)
+
+step 13
+kubectl apply -f ./service.yml
+kubectl get services
+wait till external ip appears
+external ip - http://52.153.235.30
+test in postman
+Done! Have fun
+
+//Not sure if wanted in gitignore
+#Ignore azure pipeline config
+*.yml
+
+
+CI/CD Azure devops
+step 1 move depoloyment.yml and service.yml to manifests folder
+
+step2 login to azure devops dev.azure.com
+open up project
+go to pipeline -> create pipeline
+
+step 3 select configuration "deploy to kubernetes service"
+authenticate , select kubernetes cluster, namespace = default,   
+
+40.80.200.115   8080:31071/TCP
+40.74.203.18    8080:30748/TC
+40.74.209.62    8080:30782/TCP
+
+Https: Create self signed certificate
+
+kubectl create namespace cert-manager
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml
+
+Create ingress controller
+helm install nginx-ingress stable/nginx-ingress --namespace ingress-basic --set controller.replicaCount=1 --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+
+
+
+TroubleShoot
+1. Kube Dashboard
+az aks disable-addons -a kube-dashboard -g codejammers -n cognizantreflectkubernetes --verbose
+
+2.app not deploying
+rollout status Deployment/reflectuser-deployment --timeout 0s --namespace default
+
+static ip for reflectfeedback 20.40.0.193
+ az network public-ip list
+52.183.220.137   5001 reflectfeedback
+40.80.203.53     5002 reflect 
+reflectfeedbackapi.southindia.cloudapp.azure.com
+
+CertMgr /add selfsigned-cert.cer /s /r localMachine root
+>> CertMgr /add selfsigned-cert.cer /s /r localMachine trustedpublisher
